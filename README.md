@@ -1,2 +1,2 @@
-# Computer-Vision-Assisted-Interview-Training-System
+# Mock Interview Evaluator
 Minor Project 2
