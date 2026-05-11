@@ -1,6 +1,8 @@
 # Mock Interview Evaluator
 Minor Project 2
 
+#Local Run Guide:
+
 1. Install Node.js dependencies
    {}
    >>>npm install
@@ -17,7 +19,3 @@ Minor Project 2
 4. Start the dev server
   {}
   npm run dev
-
-5. Open Browser
-   Go To:
-   http://localhost:3000 
