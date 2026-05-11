@@ -14,6 +14,10 @@ Minor Project 2
   {}
   >>>npx drizzle-kit push
 
-4. 4. Start the dev server
+4. Start the dev server
   {}
   npm run dev
+
+5. Open Browser
+   Go To:
+   http://localhost:3000 
