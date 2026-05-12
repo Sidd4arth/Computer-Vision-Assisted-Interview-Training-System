@@ -18,3 +18,7 @@ npx drizzle-kit push
 7. Start the dev server
 
 npm run dev
+
+.env.local
+
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/app_db"UI,O./}DATABASE_URL="postgresql://postgres:postgres@localhost:5432/app_db"
