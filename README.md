@@ -19,6 +19,8 @@ npx drizzle-kit push
 
 npm run dev
 
+
+
 #Environment Configuration#
 
 Before running the project, create a .env.local file in the project root directory.
