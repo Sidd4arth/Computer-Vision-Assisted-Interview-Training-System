@@ -28,6 +28,7 @@ Copy the contents from .env.example (if provided) and replace the placeholder va
 Example:
 
 API_KEY=your_api_key_here
+
 DATABASE_URL=your_database_url_here
 
 The .env.local file stores environment-specific configuration such as API keys, database connection strings, and application settings. This file should not be committed to version control because it may contain sensitive information.
