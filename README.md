@@ -19,5 +19,20 @@ npx drizzle-kit push
 
 npm run dev
 
-.env.local
+#Environment Configuration#
 
+Before running the project, create a .env.local file in the project root directory.
+
+Copy the contents from .env.example (if provided) and replace the placeholder values with your own credentials.
+
+Example:
+
+API_KEY=your_api_key_here
+DATABASE_URL=your_database_url_here
+
+The .env.local file stores environment-specific configuration such as API keys, database connection strings, and application settings. This file should not be committed to version control because it may contain sensitive information.
+
+After creating the file, install dependencies and start the development server:
+
+npm install
+npm run dev
