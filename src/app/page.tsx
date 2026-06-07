@@ -1,11 +1,18 @@
 import Link from "next/link";
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
-import { desc } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
+import { AuthNav } from "./auth-nav";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
+  // Only fetch sessions for signed-in users
+  const serverSession = await getServerSession(authOptions);
+  const userId = (serverSession?.user as any)?.id ?? null;
+
   let recentSessions: Array<{
     id: number;
     uid: string;
@@ -17,14 +24,17 @@ export default async function HomePage() {
     createdAt: Date;
   }> = [];
 
-  try {
-    recentSessions = await db
-      .select()
-      .from(sessions)
-      .orderBy(desc(sessions.createdAt))
-      .limit(5);
-  } catch {
-    // Table may not exist yet
+  if (userId) {
+    try {
+      recentSessions = await db
+        .select()
+        .from(sessions)
+        .where(eq(sessions.userId, Number(userId)))
+        .orderBy(desc(sessions.createdAt))
+        .limit(5);
+    } catch {
+      // Table may not exist yet
+    }
   }
 
   return (
@@ -33,14 +43,17 @@ export default async function HomePage() {
       <nav className="border-b border-neutral-900 px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <span className="font-mono text-sm tracking-tight text-neutral-400">
-            Interview Evaluator Model
+            MockPrep
           </span>
-          <Link
-            href="/new-session"
-            className="font-mono text-xs border border-neutral-700 hover:border-neutral-500 px-4 py-2 rounded transition-colors"
-          >
-            New Session
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/new-session"
+              className="font-mono text-xs border border-neutral-700 hover:border-neutral-500 px-4 py-2 rounded transition-colors"
+            >
+              New Session
+            </Link>
+            <AuthNav />
+          </div>
         </div>
       </nav>
 

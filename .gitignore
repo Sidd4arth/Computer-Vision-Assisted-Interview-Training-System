@@ -9,3 +9,5 @@ build/
 npm-debug.log*
 
 *.tsbuildinfo
+version1/
+.temp_exec/

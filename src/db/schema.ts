@@ -9,10 +9,20 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+// Users table
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  name: text("name"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // Interview sessions
 export const sessions = pgTable("sessions", {
   id: serial("id").primaryKey(),
   uid: varchar("uid", { length: 36 }).notNull().unique(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
   companyName: text("company_name").notNull(),
   role: text("role").notNull(),
   lpa: text("lpa").notNull(),

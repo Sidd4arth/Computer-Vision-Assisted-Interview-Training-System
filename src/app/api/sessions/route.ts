@@ -4,6 +4,8 @@ import { sessions, questions } from "@/db/schema";
 import { generateQuestionsFromGitHub } from "@/lib/github-questions";
 import { v4 as uuidv4 } from "uuid";
 import { desc } from "drizzle-orm";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,6 +19,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Get the logged-in user (optional — sessions can exist without a user)
+    const serverSession = await getServerSession(authOptions);
+    const userId = (serverSession?.user as any)?.id
+      ? Number((serverSession!.user as any).id)
+      : null;
+
     const uid = uuidv4();
 
     // Create session
@@ -29,8 +37,10 @@ export async function POST(request: NextRequest) {
         lpa: String(lpa),
         duration: Number(duration),
         status: "generating",
+        ...(userId ? { userId } : {}),
       })
       .returning();
+
 
     // Generate questions from GitHub repo
     const questionCount = duration <= 30 ? 3 : duration <= 60 ? 4 : 5;

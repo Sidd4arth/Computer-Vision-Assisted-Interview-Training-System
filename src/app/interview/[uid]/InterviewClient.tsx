@@ -59,6 +59,7 @@ export default function InterviewClient({
   const [qIdx, setQIdx] = useState(0);
   const [lang, setLang] = useState("python");
   const [codes, setCodes] = useState<Record<string, Record<string, string>>>({});
+  const [startError, setStartError] = useState("");
   const [timeLeft, setTimeLeft] = useState(session.duration * 60);
   const [running, setRunning] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -114,8 +115,18 @@ export default function InterviewClient({
   const startSession = async () => {
     try {
       const res = await fetch(`/api/sessions/${session.uid}/start`, { method: "POST" });
-      if (res.ok) setIsStarted(true);
-    } catch (e) { console.error(e); }
+      if (res.ok) {
+        setIsStarted(true);
+        setStartError("");
+      } else {
+        const data = await res.json();
+        setStartError(data.error || "Failed to start session");
+        console.error("Start session error:", data);
+      }
+    } catch (e) {
+      console.error(e);
+      setStartError("Network error while starting session");
+    }
   };
 
   const endSession = useCallback(async () => {
@@ -183,9 +194,14 @@ export default function InterviewClient({
           </div>
 
           <button onClick={startSession}
-            className="w-full bg-white text-black font-mono text-sm py-3 rounded hover:bg-neutral-200 transition-colors">
+            disabled={session.status !== "ready" || isStarted}
+            className="w-full bg-white text-black font-mono text-sm py-3 rounded hover:bg-neutral-200 transition-colors disabled:opacity-50">
             Start →
           </button>
+          {startError && (<p className="mt-2 text-xs text-red-500">{startError}</p>)}
+          {session.status !== "ready" && (
+            <p className="mt-2 text-xs text-neutral-400">Session not ready. Please wait...</p>
+          )}
         </div>
       </div>
     );
