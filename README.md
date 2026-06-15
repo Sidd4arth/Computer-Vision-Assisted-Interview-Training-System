@@ -1,152 +1,172 @@
-# Interview Evaluation Platform – Version 2 (Dashboard & Invite Features)
+# Computer Vision Assisted Interview Training System
 
-## Overview
-This repository implements a full‑stack interview preparation platform built with **Next.js 16**, **TypeScript**, **Drizzle ORM**, and **PostgreSQL**.  Version 2 introduces a **comprehensive analytics dashboard** and a **"Create" page** that generates unique interview‑invite links (video/audio chat integration is planned).
+## Local Setup and Run Guide
 
----
+### Prerequisites
 
-## Table of Contents
-- [Prerequisites](#prerequisites)
-- [Clone the Repository](#clone-the-repository)
-- [Install Dependencies](#install-dependencies)
-- [Environment Configuration](#environment-configuration)
-- [Database Setup & Migrations](#database-setup--migrations)
-- [Running the Development Server](#running-the-development-server)
-- [Building for Production](#building-for-production)
-- [Testing the New Features](#testing-the-new-features)
-- [Git Tags & Release Workflow](#git-tags--release-workflow)
-- [License](#license)
+Ensure the following software is installed on your system:
+
+* Node.js (v18 or later recommended)
+* npm
+* Docker Desktop
+* Git
 
 ---
 
-## Prerequisites
-| Tool | Minimum Version |
-|------|-----------------|
-| **Node.js** | 20.x (LTS) |
-| **npm** | 10.x |
-| **PostgreSQL** | 15.x |
-| **Git** | 2.30+ |
-| **Optional** – **Docker** (for containerised DB) |
+## Step 1: Clone the Repository
 
-Make sure `node` and `npm` are available in your `PATH`:
 ```bash
-node -v   # e.g. v20.12.0
-npm -v    # e.g. 10.5.0
-``` 
-
----
-
-## Clone the Repository
-```bash
-git clone https://github.com/<your‑username>/interview‑evaluation-platform.git
-cd interview‑evaluation-platform
-```
-
-If you need the **v2** tag specifically:
-```bash
-git checkout tags/v2 -b work-v2
+git clone https://github.com/Sidd4arth/Computer-Vision-Assisted-Interview-Training-System.git
+cd Computer-Vision-Assisted-Interview-Training-System
 ```
 
 ---
 
-## Install Dependencies
+## Step 2: Configure Environment Variables
+
+Create a file named `.env.local` in the project root directory.
+
+Add the required environment variables:
+
+```env
+API_KEY=your_api_key_here
+DATABASE_URL=your_database_url_here
+```
+
+### Example
+
+```env
+API_KEY=xxxxxxxxxxxxxxxxxxxx
+
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/app_db
+```
+
+> Note: The `.env.local` file contains sensitive information and should never be committed to version control.
+
+---
+
+## Step 3: Install Dependencies
+
+Install all required Node.js packages:
+
 ```bash
-npm ci   # clean install based on package-lock.json
+npm install
 ```
-The command installs all production and dev dependencies (React, Next.js, Drizzle, etc.).
 
 ---
 
-## Environment Configuration
-Create a `.env.local` file at the root (it is ignored by Git). The file must contain at least the following variables:
-```dotenv
-# Database URL (PostgreSQL)
-DATABASE_URL=postgresql://<user>:<password>@localhost:5432/app_db
+## Step 4: Start PostgreSQL Database
 
-# NextAuth secret for session signing
-NEXTAUTH_SECRET=your‑random‑secret
+Launch PostgreSQL using Docker:
 
-# Wandbox API endpoint (used by the compiler backend)
-WANDBOX_API=https://wandbox.org/api
-
-# (Optional) Set a custom port for the dev server
-PORT=3000
+```bash
+docker run --name mockprep-db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=app_db -p 5432:5432 -d postgres:15
 ```
-> **Tip:** You can copy the example from `.env.example` (if present) and adjust the values.
+
+Verify that the container is running:
+
+```bash
+docker ps
+```
 
 ---
 
-## Database Setup & Migrations
-1. **Create the database** (if it does not exist):
-   ```bash
-   createdb app_db
-   ```
-2. **Run Drizzle migrations** to generate the schema tables:
-   ```bash
-   npx drizzle-kit push   # creates tables defined in src/db/schema.ts
-   ```
-   > The command is idempotent; you can run it again after schema changes.
-3. (Optional) Seed data for local testing:
-   ```bash
-   npm run seed   # you can add a script that loads sample sessions/questions
-   ```
+## Step 5: Push Database Schema
+
+Create the required database tables using Drizzle ORM:
+
+```bash
+npx drizzle-kit push
+```
 
 ---
 
-## Running the Development Server
+## Step 6: Start the Development Server
+
+Run the application locally:
+
 ```bash
 npm run dev
 ```
-The app will be available at `http://localhost:3000` (or the port you defined). The server will hot‑reload on file changes.
-
-### Verifying the new features
-- **Dashboard** – navigate to `/dashboard` after signing in. You should see KPI cards, interactive charts, and a session history table.
-- **Create page** – visit `/create`. Use the **Invite Your Interviewer →** button to generate a UUID‑based link.
 
 ---
 
-## Building for Production
-```bash
-npm run build   # creates an optimized production bundle
-npm start       # runs the compiled server
+## Step 7: Access the Application
+
+Open your browser and navigate to:
+
+```text
+http://localhost:3000
 ```
-Make sure the `DATABASE_URL` and `NEXTAUTH_SECRET` are set in the production environment.
+
+The application should now be running locally.
 
 ---
 
-## Testing the New Features
-You can run the built‑in lint and type‑check tools:
+## Common Commands
+
+### Stop Database Container
+
 ```bash
-npm run lint          # ESLint
-npx tsc --noEmit      # TypeScript type check
+docker stop mockprep-db
 ```
-For end‑to‑end verification, open a browser and:
-1. Sign up / log in.
-2. Complete a mock interview session.
-3. Visit `/dashboard` – the charts should reflect your data.
-4. Go to `/create` – generate and copy an invite link.
 
----
+### Start Existing Database Container
 
-## Git Tags & Release Workflow
-- **Tag `v1`** – the first basic version (no dashboard).
-- **Tag `v2`** – this version with dashboard & invite page.
-
-To create a new tag after further changes:
 ```bash
-git commit -am "Your commit message"
-# Bump the version (semantic versioning recommended)
-git tag -a v3 -m "Release v3 – description"
-git push origin main --tags
+docker start mockprep-db
 ```
-The CI/CD pipeline (if configured) can automatically publish a Docker image or deploy to Vercel based on tags.
+
+### Remove Database Container
+
+```bash
+docker rm -f mockprep-db
+```
+
+### Reinstall Dependencies
+
+```bash
+rm -rf node_modules
+npm install
+```
 
 ---
 
-## License
-Distributed under the **MIT License**. See `LICENSE` for details.
+## Troubleshooting
+
+### Port 5432 Already in Use
+
+Check for another PostgreSQL instance running on your machine and stop it, or modify the Docker port mapping.
+
+### Environment Variables Not Loaded
+
+Ensure:
+
+* `.env.local` exists in the project root.
+* Variable names are spelled correctly.
+* The development server is restarted after making changes.
+
+### Database Connection Errors
+
+Verify:
+
+* Docker container is running.
+* `DATABASE_URL` matches the PostgreSQL credentials.
+* Database schema has been pushed using:
+
+```bash
+npx drizzle-kit push
+```
 
 ---
 
+## Project Workflow
+
+```bash
+npm install
+docker run --name mockprep-db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=app_db -p 5432:5432 -d postgres:15
+npx drizzle-kit push
+npm run dev
+```
 
 After completing these steps, the Computer Vision Assisted Interview Training System will be available locally for development and testing.
