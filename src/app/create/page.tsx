@@ -77,7 +77,7 @@ export default function CreatePage() {
         <div className="w-full max-w-lg border border-neutral-800 rounded-2xl p-8 bg-neutral-950">
           <p className="font-mono text-xs text-neutral-600 uppercase tracking-widest mb-2">Invite System</p>
           <p className="text-neutral-400 text-sm leading-relaxed mb-8">
-            Generate a unique invite link you can share with your interviewer. They'll join a private session room with
+            Generate a unique invite link you can share with your interviewer. They&apos;ll join a private session room with
             integrated video and audio chat.
           </p>
 

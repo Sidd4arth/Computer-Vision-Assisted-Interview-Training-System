@@ -86,6 +86,7 @@ export default function InterviewClient({
   const [toasts, setToasts] = useState<WarningToast[]>([]);
   const [mobPanel, setMobPanel] = useState<"problem" | "code" | "webcam">("problem");
   const [camGlow, setCamGlow] = useState(false);
+  const [events, setEvents] = useState<WebcamEvent[]>([]);
 
   const evtsRef = useRef<WebcamEvent[]>([]);
   const toastId = useRef(0);
@@ -127,7 +128,10 @@ export default function InterviewClient({
     setTimeout(() => setToasts((p) => p.filter((t) => t.id !== id)), 4000);
   }, []);
 
-  const onEvts = useCallback((e: WebcamEvent[]) => { evtsRef.current = e; }, []);
+  const onEvts = useCallback((e: WebcamEvent[]) => {
+    evtsRef.current = e;
+    setEvents(e);
+  }, []);
 
   const startSession = async () => {
     try {
@@ -429,11 +433,11 @@ export default function InterviewClient({
           </div>
           <div className="border border-neutral-900 rounded-lg p-2.5">
             <p className="font-mono text-[9px] text-neutral-700 uppercase tracking-wider mb-2">Alerts</p>
-            {evtsRef.current.length === 0 ? (
+            {events.length === 0 ? (
               <p className="font-mono text-[10px] text-neutral-800">None yet</p>
             ) : (
               <div className="space-y-1 max-h-32 overflow-y-auto">
-                {evtsRef.current.slice(-6).reverse().map((evt, i) => (
+                {events.slice(-6).reverse().map((evt, i) => (
                   <div key={i} className="flex items-start gap-1.5">
                     <span className="mt-1 w-1 h-1 rounded-full bg-neutral-600 shrink-0" />
                     <div>

@@ -20,7 +20,6 @@ export default function NewSessionPage() {
   const [error, setError] = useState("");
 
   const [companies, setCompanies] = useState<string[]>([]);
-  const [filteredCompanies, setFilteredCompanies] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -35,16 +34,12 @@ export default function NewSessionPage() {
     fetchCompanies();
   }, []);
 
-  useEffect(() => {
-    if (companyName.trim().length === 0) {
-      setFilteredCompanies(companies.slice(0, 12));
-    } else {
-      const search = companyName.toLowerCase();
-      setFilteredCompanies(
-        companies.filter((c) => c.toLowerCase().includes(search)).slice(0, 8)
-      );
-    }
-  }, [companyName, companies]);
+  const filteredCompanies =
+    companyName.trim().length === 0
+      ? companies.slice(0, 12)
+      : companies
+          .filter((c) => c.toLowerCase().includes(companyName.toLowerCase()))
+          .slice(0, 8);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

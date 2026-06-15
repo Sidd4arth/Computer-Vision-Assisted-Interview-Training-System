@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { sessions, questions } from "@/db/schema";
-import { generateQuestionsFromGitHub } from "@/lib/github-questions";
+import { pickStaticQuestions } from "@/lib/static-questions";
 import { v4 as uuidv4 } from "uuid";
 import { desc } from "drizzle-orm";
 import { getServerSession } from "next-auth";
@@ -41,20 +41,14 @@ export async function POST(request: NextRequest) {
       })
       .returning();
 
-
-    // Generate questions from GitHub repo
+    // Pick random questions from the static pool (always 10 available, pick based on duration)
     const questionCount = duration <= 30 ? 3 : duration <= 60 ? 4 : 5;
-    
-    console.log(`Generating ${questionCount} questions for ${companyName} - ${role}`);
-    
-    const generated = await generateQuestionsFromGitHub(
-      companyName, 
-      role, 
-      lpa, 
-      questionCount
-    );
 
-    console.log(`Generated ${generated.length} questions`);
+    console.log(`Picking ${questionCount} static questions for ${companyName} - ${role}`);
+
+    const generated = pickStaticQuestions(questionCount);
+
+    console.log(`Selected ${generated.length} questions`);
 
     // Store questions
     for (let i = 0; i < generated.length; i++) {

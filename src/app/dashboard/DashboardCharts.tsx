@@ -39,85 +39,115 @@ interface Props {
   aggregate: Aggregate;
 }
 
-const COLORS = {
-  white: "#e5e5e5",
-  mid: "#737373",
-  dim: "#404040",
-  dark: "#1a1a1a",
-  bg: "#0a0a0a",
+const C = {
+  indigo:  "#818cf8", // light indigo
+  cyan:    "#22d3ee", // light cyan
+  emerald: "#34d399", // light emerald
+  amber:   "#fbbf24", // light amber
+  purple:  "#a78bfa", // light purple
+  pink:    "#f472b6", // light pink
+  orange:  "#fb923c",
+  text:    "#e5e5e5",
+  dim:     "#737373", // neutral-500
+  grid:    "rgba(255,255,255,0.03)",
+  pie: ["#818cf8", "#34d399", "#fbbf24", "#f472b6", "#22d3ee", "#a78bfa"],
 };
 
 export default function DashboardCharts({ sessions, aggregate }: Props) {
-  const scoreLineRef = useRef<HTMLCanvasElement>(null);
-  const passRateRef = useRef<HTMLCanvasElement>(null);
-  const behaviorRef = useRef<HTMLCanvasElement>(null);
-  const verdictRef = useRef<HTMLCanvasElement>(null);
-  const langRef = useRef<HTMLCanvasElement>(null);
-  const timingRef = useRef<HTMLCanvasElement>(null);
+  const scoreLineRef  = useRef<HTMLCanvasElement>(null);
+  const passRateRef   = useRef<HTMLCanvasElement>(null);
+  const behaviorRef   = useRef<HTMLCanvasElement>(null);
+  const verdictRef    = useRef<HTMLCanvasElement>(null);
+  const langRef       = useRef<HTMLCanvasElement>(null);
+  const timingRef     = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    if (scoreLineRef.current) drawScoreLine(scoreLineRef.current, sessions);
-    if (passRateRef.current) drawPassRateBar(passRateRef.current, sessions);
-    if (behaviorRef.current) drawBehaviorLine(behaviorRef.current, sessions);
-    if (verdictRef.current) drawVerdictDist(verdictRef.current, aggregate.verdictDist);
-    if (langRef.current) drawLangDist(langRef.current, aggregate.langDist);
-    if (timingRef.current) drawTimingBar(timingRef.current, sessions);
+    if (scoreLineRef.current)  drawScoreLine(scoreLineRef.current, sessions);
+    if (passRateRef.current)   drawPassRateBar(passRateRef.current, sessions);
+    if (behaviorRef.current)   drawBehaviorLine(behaviorRef.current, sessions);
+    if (verdictRef.current)    drawVerdictDist(verdictRef.current, aggregate.verdictDist);
+    if (langRef.current)       drawLangDist(langRef.current, aggregate.langDist);
+    if (timingRef.current)     drawTimingBar(timingRef.current, sessions);
   }, [sessions, aggregate]);
+
+  const cardStyle = {
+    borderRadius: 12,
+    padding: 20,
+    background: "#000000",
+    border: "1px solid #171717",
+  } as const;
+
+  const labelStyle = {
+    fontFamily: "'JetBrains Mono',monospace",
+    fontSize: 10,
+    color: "#a3a3a3", // neutral-400
+    textTransform: "uppercase" as const,
+    letterSpacing: "0.12em",
+    marginBottom: 2,
+  };
+
+  const sublabelStyle = {
+    fontSize: 11,
+    color: "#525252", // neutral-600
+    marginBottom: 14,
+  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
       {/* Score Trend */}
-      <div className="border border-neutral-900 rounded-xl p-5 md:col-span-2 xl:col-span-2">
-        <p className="font-mono text-[10px] text-neutral-600 uppercase tracking-widest mb-1">Overall Score Trend</p>
-        <p className="text-xs text-neutral-700 mb-4">Composite score across all sessions</p>
+      <div style={{ ...cardStyle, gridColumn: "span 2" }} className="md:col-span-2">
+        <p style={labelStyle}>Overall Score Trend</p>
+        <p style={sublabelStyle}>Composite score across all sessions</p>
         <canvas ref={scoreLineRef} className="w-full" height={160} style={{ display: "block" }} />
       </div>
 
       {/* Verdict Distribution */}
-      <div className="border border-neutral-900 rounded-xl p-5">
-        <p className="font-mono text-[10px] text-neutral-600 uppercase tracking-widest mb-1">Submission Verdicts</p>
-        <p className="text-xs text-neutral-700 mb-4">Distribution of all submission outcomes</p>
+      <div style={cardStyle}>
+        <p style={labelStyle}>Submission Verdicts</p>
+        <p style={sublabelStyle}>Distribution of all outcomes</p>
         <canvas ref={verdictRef} className="w-full" height={160} style={{ display: "block" }} />
       </div>
 
       {/* Pass Rate */}
-      <div className="border border-neutral-900 rounded-xl p-5">
-        <p className="font-mono text-[10px] text-neutral-600 uppercase tracking-widest mb-1">Pass Rate per Session</p>
-        <p className="text-xs text-neutral-700 mb-4">% of test cases passed</p>
+      <div style={cardStyle}>
+        <p style={labelStyle}>Pass Rate per Session</p>
+        <p style={sublabelStyle}>% of test cases passed</p>
         <canvas ref={passRateRef} className="w-full" height={160} style={{ display: "block" }} />
       </div>
 
       {/* Behavioral */}
-      <div className="border border-neutral-900 rounded-xl p-5">
-        <p className="font-mono text-[10px] text-neutral-600 uppercase tracking-widest mb-1">Behavioral Metrics</p>
-        <p className="text-xs text-neutral-700 mb-4">Posture, gaze & focus across sessions</p>
+      <div style={cardStyle}>
+        <p style={labelStyle}>Behavioral Metrics</p>
+        <p style={sublabelStyle}>Posture, gaze & focus trends</p>
         <canvas ref={behaviorRef} className="w-full" height={160} style={{ display: "block" }} />
       </div>
 
       {/* Time vs Duration */}
-      <div className="border border-neutral-900 rounded-xl p-5">
-        <p className="font-mono text-[10px] text-neutral-600 uppercase tracking-widest mb-1">Time Usage</p>
-        <p className="text-xs text-neutral-700 mb-4">Time taken vs allotted duration</p>
+      <div style={cardStyle}>
+        <p style={labelStyle}>Time Usage</p>
+        <p style={sublabelStyle}>Time taken vs allotted duration</p>
         <canvas ref={timingRef} className="w-full" height={160} style={{ display: "block" }} />
       </div>
 
       {/* Language Distribution */}
-      <div className="border border-neutral-900 rounded-xl p-5">
-        <p className="font-mono text-[10px] text-neutral-600 uppercase tracking-widest mb-1">Languages Used</p>
-        <p className="text-xs text-neutral-700 mb-4">Breakdown of coding languages</p>
+      <div style={cardStyle}>
+        <p style={labelStyle}>Languages Used</p>
+        <p style={sublabelStyle}>Breakdown of coding languages</p>
         <canvas ref={langRef} className="w-full" height={160} style={{ display: "block" }} />
       </div>
     </div>
   );
 }
 
-// ─── Canvas Drawing Helpers ────────────────────────────────────────────────────
+// ─── Canvas helpers ────────────────────────────────────────────────────────────
 
 function getCanvasWidth(canvas: HTMLCanvasElement): number {
   return canvas.clientWidth > 0 ? canvas.clientWidth : canvas.width;
 }
 
-function setupCanvas(canvas: HTMLCanvasElement): { ctx: CanvasRenderingContext2D; W: number; H: number } | null {
+function setupCanvas(
+  canvas: HTMLCanvasElement
+): { ctx: CanvasRenderingContext2D; W: number; H: number } | null {
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
   const W = getCanvasWidth(canvas) || canvas.width;
@@ -127,31 +157,45 @@ function setupCanvas(canvas: HTMLCanvasElement): { ctx: CanvasRenderingContext2D
   return { ctx, W, H };
 }
 
+function drawGridLines(
+  ctx: CanvasRenderingContext2D,
+  pad: { t: number; r: number; b: number; l: number },
+  W: number,
+  H: number,
+  steps = 4,
+  maxVal = 100,
+  unit = ""
+) {
+  const w = W - pad.l - pad.r;
+  const h = H - pad.t - pad.b;
+  for (let i = 0; i <= steps; i++) {
+    const y = pad.t + (i / steps) * h;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, y);
+    ctx.lineTo(pad.l + w, y);
+    ctx.strokeStyle = C.grid;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = C.dim;
+    ctx.font = "9px 'JetBrains Mono',monospace";
+    ctx.textAlign = "right";
+    const val = Math.round(maxVal - (i / steps) * maxVal);
+    ctx.fillText(String(val) + unit, pad.l - 5, y + 3);
+  }
+}
+
+// Score trend line chart
 function drawScoreLine(canvas: HTMLCanvasElement, sessions: SessionStat[]) {
   const setup = setupCanvas(canvas);
   if (!setup) return;
   const { ctx, W, H } = setup;
-
   if (sessions.length === 0) { drawEmpty(ctx, W, H); return; }
 
-  const pad = { t: 20, r: 20, b: 30, l: 40 };
+  const pad = { t: 20, r: 20, b: 30, l: 42 };
   const w = W - pad.l - pad.r;
   const h = H - pad.t - pad.b;
 
-  // Grid lines
-  for (let i = 0; i <= 4; i++) {
-    const y = pad.t + (i / 4) * h;
-    ctx.beginPath();
-    ctx.moveTo(pad.l, y);
-    ctx.lineTo(pad.l + w, y);
-    ctx.strokeStyle = "#1a1a1a";
-    ctx.lineWidth = 1;
-    ctx.stroke();
-    ctx.fillStyle = "#404040";
-    ctx.font = "9px 'JetBrains Mono', monospace";
-    ctx.textAlign = "right";
-    ctx.fillText(String(100 - i * 25), pad.l - 5, y + 3);
-  }
+  drawGridLines(ctx, pad, W, H);
 
   const pts = sessions.map((s, i) => ({
     x: pad.l + (sessions.length === 1 ? w / 2 : (i / (sessions.length - 1)) * w),
@@ -159,119 +203,95 @@ function drawScoreLine(canvas: HTMLCanvasElement, sessions: SessionStat[]) {
     s,
   }));
 
-  // Area fill
+  // Clean, thin fill gradient
+  const grad = ctx.createLinearGradient(0, pad.t, 0, pad.t + h);
+  grad.addColorStop(0, "rgba(129,138,248,0.05)");
+  grad.addColorStop(1, "rgba(129,138,248,0.00)");
+
   ctx.beginPath();
-  pts.forEach(({ x, y }, i) => i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y));
+  pts.forEach(({ x, y }, i) => (i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)));
   ctx.lineTo(pts[pts.length - 1].x, pad.t + h);
   ctx.lineTo(pts[0].x, pad.t + h);
   ctx.closePath();
-  ctx.fillStyle = "rgba(115,115,115,0.07)";
+  ctx.fillStyle = grad;
   ctx.fill();
 
   // Line
   ctx.beginPath();
-  pts.forEach(({ x, y }, i) => i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y));
-  ctx.strokeStyle = "#737373";
+  pts.forEach(({ x, y }, i) => (i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)));
+  ctx.strokeStyle = C.indigo;
   ctx.lineWidth = 1.5;
+  ctx.lineJoin = "round";
   ctx.stroke();
 
   // Dots + labels
-  pts.forEach(({ x, y, s }, i) => {
+  pts.forEach(({ x, y, s }) => {
     ctx.beginPath();
     ctx.arc(x, y, 3, 0, Math.PI * 2);
-    ctx.fillStyle = "#e5e5e5";
+    ctx.fillStyle = C.indigo;
     ctx.fill();
-    ctx.fillStyle = "#525252";
-    ctx.font = "8px 'JetBrains Mono', monospace";
+
+    ctx.fillStyle = C.dim;
+    ctx.font = "8px 'JetBrains Mono',monospace";
     ctx.textAlign = "center";
     ctx.fillText(s.companyName.slice(0, 6), x, pad.t + h + 16);
-    ctx.fillStyle = "#737373";
-    ctx.fillText(String(s.score), x, y - 7);
+    ctx.fillStyle = C.text;
+    ctx.fillText(String(s.score), x, y - 8);
   });
 }
 
+// Pass rate bar chart
 function drawPassRateBar(canvas: HTMLCanvasElement, sessions: SessionStat[]) {
   const setup = setupCanvas(canvas);
   if (!setup) return;
   const { ctx, W, H } = setup;
-
   if (sessions.length === 0) { drawEmpty(ctx, W, H); return; }
 
-  const pad = { t: 20, r: 10, b: 30, l: 35 };
+  const pad = { t: 20, r: 10, b: 30, l: 38 };
   const w = W - pad.l - pad.r;
   const h = H - pad.t - pad.b;
-  const bw = Math.min(28, w / sessions.length - 6);
+  const bw = Math.min(24, w / sessions.length - 6);
   const gap = (w - bw * sessions.length) / (sessions.length + 1);
 
-  // Y axis
-  for (let i = 0; i <= 4; i++) {
-    const y = pad.t + (i / 4) * h;
-    ctx.beginPath();
-    ctx.moveTo(pad.l, y);
-    ctx.lineTo(pad.l + w, y);
-    ctx.strokeStyle = "#1a1a1a";
-    ctx.lineWidth = 1;
-    ctx.stroke();
-    ctx.fillStyle = "#404040";
-    ctx.font = "9px 'JetBrains Mono', monospace";
-    ctx.textAlign = "right";
-    ctx.fillText(String(100 - i * 25) + "%", pad.l - 3, y + 3);
-  }
+  drawGridLines(ctx, pad, W, H, 4, 100, "%");
 
   sessions.forEach((s, i) => {
     const x = pad.l + gap * (i + 1) + bw * i;
     const bh = (s.passRate / 100) * h;
     const y = pad.t + h - bh;
 
-    // Bar background
-    ctx.fillStyle = "#111";
-    ctx.fillRect(x, pad.t, bw, h);
+    // Solid minimalist bar
+    ctx.fillStyle = C.emerald;
+    ctx.beginPath();
+    ctx.rect(x, y, bw, bh);
+    ctx.fill();
 
-    // Bar fill
-    const alpha = 0.4 + 0.6 * (s.passRate / 100);
-    ctx.fillStyle = `rgba(115,115,115,${alpha})`;
-    ctx.fillRect(x, y, bw, bh);
-
-    // Label
-    ctx.fillStyle = "#525252";
-    ctx.font = "8px 'JetBrains Mono', monospace";
+    ctx.fillStyle = C.dim;
+    ctx.font = "8px 'JetBrains Mono',monospace";
     ctx.textAlign = "center";
     ctx.fillText(s.companyName.slice(0, 5), x + bw / 2, pad.t + h + 14);
-    ctx.fillStyle = "#737373";
+    ctx.fillStyle = C.text;
     ctx.fillText(s.passRate + "%", x + bw / 2, Math.max(y - 4, pad.t + 10));
   });
 }
 
+// Behavioral multi-line chart
 function drawBehaviorLine(canvas: HTMLCanvasElement, sessions: SessionStat[]) {
   const setup = setupCanvas(canvas);
   if (!setup) return;
   const { ctx, W, H } = setup;
-
   if (sessions.length === 0) { drawEmpty(ctx, W, H); return; }
 
-  const pad = { t: 20, r: 20, b: 30, l: 35 };
+  const pad = { t: 20, r: 20, b: 30, l: 38 };
   const w = W - pad.l - pad.r;
   const h = H - pad.t - pad.b;
 
-  // Grid
-  for (let i = 0; i <= 4; i++) {
-    const y = pad.t + (i / 4) * h;
-    ctx.beginPath();
-    ctx.moveTo(pad.l, y);
-    ctx.lineTo(pad.l + w, y);
-    ctx.strokeStyle = "#1a1a1a";
-    ctx.lineWidth = 1;
-    ctx.stroke();
-    ctx.fillStyle = "#404040";
-    ctx.font = "9px 'JetBrains Mono', monospace";
-    ctx.textAlign = "right";
-    ctx.fillText(String(100 - i * 25), pad.l - 3, y + 3);
-  }
+  drawGridLines(ctx, pad, W, H);
 
   const lines = [
-    { key: "postureScore" as const, color: "#737373", label: "Posture" },
-    { key: "gazeScore" as const, color: "#525252", label: "Gaze" },
-    { key: "focusScore" as const, color: "#404040", label: "Focus" },
+    { key: "postureScore" as const, color: C.cyan,   label: "Posture" },
+    { key: "gazeScore"   as const, color: C.purple, label: "Gaze"    },
+    { key: "focusScore"  as const, color: C.amber,  label: "Focus"   },
   ];
 
   lines.forEach(({ key, color, label }, li) => {
@@ -281,9 +301,10 @@ function drawBehaviorLine(canvas: HTMLCanvasElement, sessions: SessionStat[]) {
     }));
 
     ctx.beginPath();
-    pts.forEach(({ x, y }, i) => i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y));
+    pts.forEach(({ x, y }, i) => (i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)));
     ctx.strokeStyle = color;
     ctx.lineWidth = 1.5;
+    ctx.lineJoin = "round";
     ctx.stroke();
 
     pts.forEach(({ x, y }) => {
@@ -293,15 +314,22 @@ function drawBehaviorLine(canvas: HTMLCanvasElement, sessions: SessionStat[]) {
       ctx.fill();
     });
 
-    // Legend
+    // Legend item (square + label)
     ctx.fillStyle = color;
-    ctx.font = "8px 'JetBrains Mono', monospace";
+    ctx.fillRect(pad.l + li * 65, pad.t - 12, 6, 6);
+    ctx.fillStyle = C.text;
+    ctx.font = "8px 'JetBrains Mono',monospace";
     ctx.textAlign = "left";
-    ctx.fillText(`— ${label}`, pad.l + li * 60, pad.t - 6);
+    ctx.textBaseline = "middle";
+    ctx.fillText(label, pad.l + li * 65 + 10, pad.t - 9);
   });
 }
 
-function drawVerdictDist(canvas: HTMLCanvasElement, dist: Record<string, number>) {
+// Verdict donut chart
+function drawVerdictDist(
+  canvas: HTMLCanvasElement,
+  dist: Record<string, number>
+) {
   const setup = setupCanvas(canvas);
   if (!setup) return;
   const { ctx, W, H } = setup;
@@ -309,53 +337,48 @@ function drawVerdictDist(canvas: HTMLCanvasElement, dist: Record<string, number>
   const entries = Object.entries(dist);
   if (entries.length === 0) { drawEmpty(ctx, W, H); return; }
 
-  const cx = W / 2, cy = H / 2, r = Math.min(W, H) / 2 - 20;
-  const ir = r * 0.55;
+  const cx = W / 2, cy = (H - 18) / 2 + 8;
+  const r = Math.min(W / 2, (H - 18) / 2) - 16;
+  const ir = r * 0.70; // clean thinner ring
   const total = entries.reduce((a, [, v]) => a + v, 0);
-  const shades = ["#e5e5e5", "#a3a3a3", "#737373", "#525252", "#404040", "#2a2a2a"];
 
   let start = -Math.PI / 2;
   entries.forEach(([label, val], i) => {
     const angle = (val / total) * Math.PI * 2;
+    const color = C.pie[i % C.pie.length];
+
     ctx.beginPath();
     ctx.arc(cx, cy, r, start, start + angle);
     ctx.arc(cx, cy, ir, start + angle, start, true);
     ctx.closePath();
-    ctx.fillStyle = shades[i % shades.length];
+    ctx.fillStyle = color;
     ctx.fill();
-
-    // Label on segment
-    const midAngle = start + angle / 2;
-    const lx = cx + (r + ir) / 2 * Math.cos(midAngle);
-    const ly = cy + (r + ir) / 2 * Math.sin(midAngle);
-    if (angle > 0.3) {
-      ctx.fillStyle = i === 0 ? "#0a0a0a" : "#e5e5e5";
-      ctx.font = "bold 8px 'JetBrains Mono', monospace";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(String(val), lx, ly);
-    }
 
     start += angle;
   });
 
-  // Legend below chart
+  // Legend at bottom
   const legendY = H - 5;
   let lx = 8;
+  ctx.textBaseline = "middle";
   entries.forEach(([label], i) => {
-    ctx.fillStyle = shades[i % shades.length];
-    ctx.fillRect(lx, legendY - 8, 6, 6);
-    ctx.fillStyle = "#525252";
-    ctx.font = "7px 'JetBrains Mono', monospace";
+    const color = C.pie[i % C.pie.length];
+    ctx.fillStyle = color;
+    ctx.fillRect(lx, legendY - 6, 6, 6);
+    ctx.fillStyle = C.dim;
+    ctx.font = "8px 'JetBrains Mono',monospace";
     ctx.textAlign = "left";
-    ctx.textBaseline = "middle";
-    ctx.fillText(label.slice(0, 8), lx + 8, legendY - 5);
-    lx += label.slice(0, 8).length * 5 + 20;
-    if (lx > W - 30) { lx = 8; }
+    ctx.fillText(label.slice(0, 8), lx + 10, legendY - 3);
+    lx += label.slice(0, 8).length * 5.5 + 22;
+    if (lx > W - 30) lx = 8;
   });
 }
 
-function drawLangDist(canvas: HTMLCanvasElement, dist: Record<string, number>) {
+// Language horizontal bar chart
+function drawLangDist(
+  canvas: HTMLCanvasElement,
+  dist: Record<string, number>
+) {
   const setup = setupCanvas(canvas);
   if (!setup) return;
   const { ctx, W, H } = setup;
@@ -363,105 +386,97 @@ function drawLangDist(canvas: HTMLCanvasElement, dist: Record<string, number>) {
   const entries = Object.entries(dist);
   if (entries.length === 0) { drawEmpty(ctx, W, H); return; }
 
-  const pad = { t: 15, r: 10, b: 10, l: 70 };
+  const pad = { t: 15, r: 12, b: 10, l: 60 };
   const w = W - pad.l - pad.r;
   const h = H - pad.t - pad.b;
-  const bh = Math.min(22, h / entries.length - 4);
+  const bh = Math.min(18, h / entries.length - 4);
   const maxVal = Math.max(...entries.map(([, v]) => v), 1);
+  const barColors = [C.indigo, C.cyan, C.emerald, C.purple, C.amber, C.pink];
 
   entries.forEach(([lang, val], i) => {
     const y = pad.t + i * (bh + 6);
     const bw = (val / maxVal) * w;
+    const color = barColors[i % barColors.length];
 
-    // Background
-    ctx.fillStyle = "#111";
-    ctx.fillRect(pad.l, y, w, bh);
+    // Solid bar
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.rect(pad.l, y, bw, bh);
+    ctx.fill();
 
-    // Fill
-    const alpha = 0.35 + 0.65 * (val / maxVal);
-    ctx.fillStyle = `rgba(115,115,115,${alpha})`;
-    ctx.fillRect(pad.l, y, bw, bh);
-
-    // Label
-    ctx.fillStyle = "#737373";
-    ctx.font = "9px 'JetBrains Mono', monospace";
+    ctx.fillStyle = C.text;
+    ctx.font = "9px 'JetBrains Mono',monospace";
     ctx.textAlign = "right";
     ctx.textBaseline = "middle";
-    ctx.fillText(lang, pad.l - 5, y + bh / 2);
+    ctx.fillText(lang, pad.l - 6, y + bh / 2);
 
-    // Count
-    ctx.fillStyle = "#525252";
+    ctx.fillStyle = C.dim;
     ctx.textAlign = "left";
-    ctx.fillText(String(val), pad.l + bw + 5, y + bh / 2);
+    ctx.fillText(String(val), pad.l + bw + 6, y + bh / 2);
   });
 }
 
+// Timing paired bar chart
 function drawTimingBar(canvas: HTMLCanvasElement, sessions: SessionStat[]) {
   const setup = setupCanvas(canvas);
   if (!setup) return;
   const { ctx, W, H } = setup;
-
   if (sessions.length === 0) { drawEmpty(ctx, W, H); return; }
 
-  const pad = { t: 20, r: 10, b: 30, l: 35 };
+  const pad = { t: 20, r: 10, b: 30, l: 38 };
   const w = W - pad.l - pad.r;
   const h = H - pad.t - pad.b;
   const pairW = w / sessions.length;
-  const bw = Math.min(14, pairW / 3);
+  const bw = Math.min(12, pairW / 3);
 
   const maxDur = Math.max(...sessions.map((s) => s.duration), 1);
 
-  // Y axis
-  for (let i = 0; i <= 4; i++) {
-    const y = pad.t + (i / 4) * h;
-    ctx.beginPath();
-    ctx.moveTo(pad.l, y);
-    ctx.lineTo(pad.l + w, y);
-    ctx.strokeStyle = "#1a1a1a";
-    ctx.lineWidth = 1;
-    ctx.stroke();
-    ctx.fillStyle = "#404040";
-    ctx.font = "9px 'JetBrains Mono', monospace";
-    ctx.textAlign = "right";
-    ctx.fillText(String(Math.round(maxDur - (i / 4) * maxDur)) + "m", pad.l - 3, y + 3);
-  }
+  drawGridLines(ctx, pad, W, H, 4, maxDur, "m");
 
   sessions.forEach((s, i) => {
     const cx = pad.l + (i + 0.5) * pairW;
 
-    // Duration bar (total allotted)
+    // Allotted bar (gray/dark)
     const dh = (s.duration / maxDur) * h;
-    ctx.fillStyle = "#1e1e1e";
-    ctx.fillRect(cx - bw - 2, pad.t + h - dh, bw, dh);
+    ctx.fillStyle = "rgba(255,255,255,0.08)";
+    ctx.beginPath();
+    ctx.rect(cx - bw - 2, pad.t + h - dh, bw, dh);
+    ctx.fill();
 
-    // Time taken bar
+    // Time taken bar (emerald / orange if high)
     const th = (Math.min(s.timeTaken, s.duration) / maxDur) * h;
     const ratio = s.timeTaken / s.duration;
-    ctx.fillStyle = ratio > 0.9 ? "#525252" : "#737373";
-    ctx.fillRect(cx + 2, pad.t + h - th, bw, th);
+    const tColor = ratio > 0.9 ? C.orange : C.emerald;
+    ctx.fillStyle = tColor;
+    ctx.beginPath();
+    ctx.rect(cx + 2, pad.t + h - th, bw, th);
+    ctx.fill();
 
-    ctx.fillStyle = "#404040";
-    ctx.font = "8px 'JetBrains Mono', monospace";
+    ctx.fillStyle = C.dim;
+    ctx.font = "8px 'JetBrains Mono',monospace";
     ctx.textAlign = "center";
+    ctx.textBaseline = "alphabetic";
     ctx.fillText(s.companyName.slice(0, 5), cx, pad.t + h + 14);
   });
 
   // Legend
-  ctx.fillStyle = "#2a2a2a";
-  ctx.fillRect(pad.l, pad.t - 14, 8, 8);
-  ctx.fillStyle = "#404040";
-  ctx.font = "8px 'JetBrains Mono', monospace";
+  ctx.fillStyle = "rgba(255,255,255,0.08)";
+  ctx.fillRect(pad.l, pad.t - 14, 6, 6);
+  ctx.fillStyle = C.dim;
+  ctx.font = "8px 'JetBrains Mono',monospace";
   ctx.textAlign = "left";
-  ctx.fillText("Allotted", pad.l + 11, pad.t - 8);
-  ctx.fillStyle = "#737373";
-  ctx.fillRect(pad.l + 70, pad.t - 14, 8, 8);
-  ctx.fillStyle = "#404040";
-  ctx.fillText("Used", pad.l + 83, pad.t - 8);
+  ctx.textBaseline = "middle";
+  ctx.fillText("Allotted", pad.l + 10, pad.t - 10);
+
+  ctx.fillStyle = C.emerald;
+  ctx.fillRect(pad.l + 68, pad.t - 14, 6, 6);
+  ctx.fillStyle = C.dim;
+  ctx.fillText("Used", pad.l + 78, pad.t - 10);
 }
 
 function drawEmpty(ctx: CanvasRenderingContext2D, W: number, H: number) {
-  ctx.fillStyle = "#262626";
-  ctx.font = "11px 'JetBrains Mono', monospace";
+  ctx.fillStyle = C.dim;
+  ctx.font = "11px 'JetBrains Mono',monospace";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText("No data yet", W / 2, H / 2);

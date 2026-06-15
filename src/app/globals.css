@@ -47,6 +47,10 @@ body {
 }
 .webcam-glow { animation: glow-ring 1s ease-out; }
 
+/* Table row hover */
+.tr-hover { transition: background 0.15s ease; }
+.tr-hover:hover { background: rgba(255,255,255,0.03) !important; }
+
 /* Code editor */
 .cm-editor { height: 100% !important; }
 .cm-scroller { overflow: auto !important; }

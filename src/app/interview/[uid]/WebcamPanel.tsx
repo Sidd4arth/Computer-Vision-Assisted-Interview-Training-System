@@ -212,6 +212,9 @@ export default function WebcamPanel({ isStarted, onEventsUpdate, onWarning }: We
     }
   };
 
+  const onPoseResultsRef = useRef(onPoseResults);
+  onPoseResultsRef.current = onPoseResults;
+
   useEffect(() => {
     if (!isStarted) return;
 
@@ -240,7 +243,7 @@ export default function WebcamPanel({ isStarted, onEventsUpdate, onWarning }: We
           minTrackingConfidence: 0.5,
         });
 
-        pose.onResults(onPoseResults);
+        pose.onResults((res: any) => onPoseResultsRef.current(res));
         poseRef.current = pose;
 
         const camera = new (window as any).Camera(video, {
