@@ -16,8 +16,8 @@ Ensure the following software is installed on your system:
 ## Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/Sidd4arth/Computer-Vision-Assisted-Interview-Training-System.git
-cd Computer-Vision-Assisted-Interview-Training-System
+git clone https://github.com/Sidd4arth/AI-Powered-Mock-Interview-Evaluator-with-Real-Time-Behavioural-Analysis-and-Integrated-Coding.git
+cd AI-Powered-Mock-Interview-Evaluator-with-Real-Time-Behavioural-Analysis-and-Integrated-Coding
 ```
 
 ---
