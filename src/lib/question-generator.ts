@@ -50,12 +50,10 @@ const questionTemplates: GeneratedQuestion[] = [
       },
     ],
     starterCode: {
-      python:
-        "def two_sum(nums, target):\n    # Write your solution here\n    pass\n\n# Read input\nnums = eval(input())\ntarget = int(input())\nprint(two_sum(nums, target))",
-      cpp: '#include <iostream>\n#include <vector>\n#include <unordered_map>\nusing namespace std;\n\nvector<int> twoSum(vector<int>& nums, int target) {\n    // Write your solution here\n    return {};\n}\n\nint main() {\n    // Input parsing handled\n    return 0;\n}',
-      java: 'import java.util.*;\n\npublic class Main {\n    public static int[] twoSum(int[] nums, int target) {\n        // Write your solution here\n        return new int[]{};\n    }\n\n    public static void main(String[] args) {\n        // Input parsing handled\n    }\n}',
-      javascript:
-        "function twoSum(nums, target) {\n    // Write your solution here\n    return [];\n}\n\n// Read input\nconst nums = JSON.parse(readline());\nconst target = parseInt(readline());\nconsole.log(JSON.stringify(twoSum(nums, target)));",
+      python: "def two_sum(nums, target):\n    # Write your solution here\n    # Return a list of two indices\n    pass",
+      cpp: '#include <vector>\nusing namespace std;\n\nvector<int> twoSum(vector<int>& nums, int target) {\n    // Write your solution here\n    return {};\n}',
+      java: 'import java.util.*;\n\nclass Solution {\n    public int[] twoSum(int[] nums, int target) {\n        // Write your solution here\n        return new int[0];\n    }\n}',
+      javascript: "function twoSum(nums, target) {\n    // Write your solution here\n    return [];\n}",
     },
   },
   {
@@ -76,12 +74,10 @@ const questionTemplates: GeneratedQuestion[] = [
       { input: "{[]}", expected_output: "true", is_hidden: true },
     ],
     starterCode: {
-      python:
-        "def is_valid(s):\n    # Write your solution here\n    pass\n\ns = input()\nprint(str(is_valid(s)).lower())",
-      cpp: '#include <iostream>\n#include <stack>\n#include <string>\nusing namespace std;\n\nbool isValid(string s) {\n    // Write your solution here\n    return false;\n}\n\nint main() {\n    string s;\n    cin >> s;\n    cout << (isValid(s) ? "true" : "false");\n    return 0;\n}',
-      java: 'import java.util.*;\n\npublic class Main {\n    public static boolean isValid(String s) {\n        // Write your solution here\n        return false;\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.next();\n        System.out.println(isValid(s));\n    }\n}',
-      javascript:
-        'function isValid(s) {\n    // Write your solution here\n    return false;\n}\n\nconst s = readline();\nconsole.log(isValid(s));',
+      python: "def is_valid(s):\n    # Write your solution here\n    # Return True if valid, False otherwise\n    pass",
+      cpp: '#include <string>\n#include <stack>\nusing namespace std;\n\nbool isValid(string s) {\n    // Write your solution here\n    return false;\n}',
+      java: 'import java.util.*;\n\nclass Solution {\n    public boolean isValid(String s) {\n        // Write your solution here\n        return false;\n    }\n}',
+      javascript: "function isValid(s) {\n    // Write your solution here\n    return false;\n}",
     },
   },
   {
@@ -115,12 +111,10 @@ const questionTemplates: GeneratedQuestion[] = [
       { input: "[-2,-1]", expected_output: "-1", is_hidden: true },
     ],
     starterCode: {
-      python:
-        "def max_subarray(nums):\n    # Write your solution here\n    pass\n\nnums = eval(input())\nprint(max_subarray(nums))",
-      cpp: "#include <iostream>\n#include <vector>\n#include <climits>\nusing namespace std;\n\nint maxSubArray(vector<int>& nums) {\n    // Write your solution here\n    return 0;\n}\n\nint main() {\n    // Input parsing\n    return 0;\n}",
-      java: "import java.util.*;\n\npublic class Main {\n    public static int maxSubArray(int[] nums) {\n        // Write your solution here\n        return 0;\n    }\n\n    public static void main(String[] args) {\n        // Input parsing\n    }\n}",
-      javascript:
-        "function maxSubArray(nums) {\n    // Write your solution here\n    return 0;\n}\n\nconst nums = JSON.parse(readline());\nconsole.log(maxSubArray(nums));",
+      python: "def max_subarray(nums):\n    # Write your solution here\n    # Return the maximum subarray sum\n    pass",
+      cpp: "#include <vector>\n#include <climits>\nusing namespace std;\n\nint maxSubArray(vector<int>& nums) {\n    // Write your solution here\n    return 0;\n}",
+      java: "import java.util.*;\n\nclass Solution {\n    public int maxSubArray(int[] nums) {\n        // Write your solution here\n        return 0;\n    }\n}",
+      javascript: "function maxSubArray(nums) {\n    // Write your solution here\n    return 0;\n}",
     },
   },
   {
@@ -156,12 +150,10 @@ const questionTemplates: GeneratedQuestion[] = [
       { input: "dvdf", expected_output: "3", is_hidden: true },
     ],
     starterCode: {
-      python:
-        "def length_of_longest_substring(s):\n    # Write your solution here\n    pass\n\ns = input()\nprint(length_of_longest_substring(s))",
-      cpp: '#include <iostream>\n#include <string>\n#include <unordered_set>\nusing namespace std;\n\nint lengthOfLongestSubstring(string s) {\n    // Write your solution here\n    return 0;\n}\n\nint main() {\n    string s;\n    getline(cin, s);\n    cout << lengthOfLongestSubstring(s);\n    return 0;\n}',
-      java: 'import java.util.*;\n\npublic class Main {\n    public static int lengthOfLongestSubstring(String s) {\n        // Write your solution here\n        return 0;\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.hasNextLine() ? sc.nextLine() : "";\n        System.out.println(lengthOfLongestSubstring(s));\n    }\n}',
-      javascript:
-        "function lengthOfLongestSubstring(s) {\n    // Write your solution here\n    return 0;\n}\n\nconst s = readline() || '';\nconsole.log(lengthOfLongestSubstring(s));",
+      python: "def length_of_longest_substring(s):\n    # Write your solution here\n    pass",
+      cpp: '#include <string>\n#include <unordered_set>\nusing namespace std;\n\nint lengthOfLongestSubstring(string s) {\n    // Write your solution here\n    return 0;\n}',
+      java: 'import java.util.*;\n\nclass Solution {\n    public int lengthOfLongestSubstring(String s) {\n        // Write your solution here\n        return 0;\n    }\n}',
+      javascript: "function lengthOfLongestSubstring(s) {\n    // Write your solution here\n    return 0;\n}",
     },
   },
   {
@@ -204,12 +196,10 @@ const questionTemplates: GeneratedQuestion[] = [
       },
     ],
     starterCode: {
-      python:
-        "def merge(intervals):\n    # Write your solution here\n    pass\n\nintervals = eval(input())\nprint(merge(intervals))",
-      cpp: "#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nvector<vector<int>> merge(vector<vector<int>>& intervals) {\n    // Write your solution here\n    return {};\n}\n\nint main() {\n    // Input parsing\n    return 0;\n}",
-      java: "import java.util.*;\n\npublic class Main {\n    public static int[][] merge(int[][] intervals) {\n        // Write your solution here\n        return new int[][]{};\n    }\n\n    public static void main(String[] args) {\n        // Input parsing\n    }\n}",
-      javascript:
-        "function merge(intervals) {\n    // Write your solution here\n    return [];\n}\n\nconst intervals = JSON.parse(readline());\nconsole.log(JSON.stringify(merge(intervals)));",
+      python: "def merge(intervals):\n    # Write your solution here\n    pass",
+      cpp: "#include <vector>\n#include <algorithm>\nusing namespace std;\n\nvector<vector<int>> merge(vector<vector<int>>& intervals) {\n    // Write your solution here\n    return {};\n}",
+      java: "import java.util.*;\n\nclass Solution {\n    public int[][] merge(int[][] intervals) {\n        // Write your solution here\n        return new int[0][0];\n    }\n}",
+      javascript: "function merge(intervals) {\n    // Write your solution here\n    return [];\n}",
     },
   },
   {
@@ -239,12 +229,10 @@ const questionTemplates: GeneratedQuestion[] = [
       },
     ],
     starterCode: {
-      python:
-        "class LRUCache:\n    def __init__(self, capacity):\n        self.capacity = capacity\n        # Write your solution here\n\n    def get(self, key):\n        pass\n\n    def put(self, key, value):\n        pass\n\n# Input parsing\ncapacity = int(input())\ncache = LRUCache(capacity)\nimport sys\nfor line in sys.stdin:\n    parts = line.strip().split()\n    if parts[0] == 'get':\n        print(cache.get(int(parts[1])))\n    elif parts[0] == 'put':\n        cache.put(int(parts[1]), int(parts[2]))",
-      cpp: "#include <iostream>\n#include <unordered_map>\n#include <list>\nusing namespace std;\n\nclass LRUCache {\npublic:\n    LRUCache(int capacity) {\n        // Write your solution here\n    }\n\n    int get(int key) {\n        return -1;\n    }\n\n    void put(int key, int value) {\n    }\n};\n\nint main() {\n    // Input parsing\n    return 0;\n}",
-      java: "import java.util.*;\n\npublic class Main {\n    // Implement LRU Cache here\n    public static void main(String[] args) {\n        // Input parsing\n    }\n}",
-      javascript:
-        "class LRUCache {\n    constructor(capacity) {\n        this.capacity = capacity;\n        // Write your solution here\n    }\n\n    get(key) {\n        return -1;\n    }\n\n    put(key, value) {\n    }\n}",
+      python: "class LRUCache:\n    def __init__(self, capacity):\n        self.capacity = capacity\n        # Write your solution here\n\n    def get(self, key):\n        return -1\n\n    def put(self, key, value):\n        pass",
+      cpp: "#include <unordered_map>\n#include <list>\nusing namespace std;\n\nclass LRUCache {\npublic:\n    LRUCache(int capacity) {\n        // Write your solution here\n    }\n\n    int get(int key) {\n        return -1;\n    }\n\n    void put(int key, int value) {\n    }\n};",
+      java: "import java.util.*;\n\nclass LRUCache {\n    public LRUCache(int capacity) {\n        // Write your solution here\n    }\n\n    public int get(int key) {\n        return -1;\n    }\n\n    public void put(int key, int value) {\n    }\n}",
+      javascript: "class LRUCache {\n    constructor(capacity) {\n        this.capacity = capacity;\n        // Write your solution here\n    }\n\n    get(key) {\n        return -1;\n    }\n\n    put(key, value) {\n    }\n}",
     },
   },
 ];

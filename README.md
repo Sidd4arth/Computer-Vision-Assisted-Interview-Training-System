@@ -1,187 +1,152 @@
-# Computer Vision Assisted Interview Training System
+# Interview Evaluation Platform – Version 2 (Dashboard & Invite Features)
 
-## Local Setup and Run Guide
-
-### Prerequisites
-
-Ensure the following software is installed on your system:
-
-* Node.js (v18 or later recommended)
-* npm
-* Docker Desktop
-* Git
+## Overview
+This repository implements a full‑stack interview preparation platform built with **Next.js 16**, **TypeScript**, **Drizzle ORM**, and **PostgreSQL**.  Version 2 introduces a **comprehensive analytics dashboard** and a **"Create" page** that generates unique interview‑invite links (video/audio chat integration is planned).
 
 ---
 
-## Step 1: Clone the Repository
+## Table of Contents
+- [Prerequisites](#prerequisites)
+- [Clone the Repository](#clone-the-repository)
+- [Install Dependencies](#install-dependencies)
+- [Environment Configuration](#environment-configuration)
+- [Database Setup & Migrations](#database-setup--migrations)
+- [Running the Development Server](#running-the-development-server)
+- [Building for Production](#building-for-production)
+- [Testing the New Features](#testing-the-new-features)
+- [Git Tags & Release Workflow](#git-tags--release-workflow)
+- [License](#license)
 
+---
+
+## Prerequisites
+| Tool | Minimum Version |
+|------|-----------------|
+| **Node.js** | 20.x (LTS) |
+| **npm** | 10.x |
+| **PostgreSQL** | 15.x |
+| **Git** | 2.30+ |
+| **Optional** – **Docker** (for containerised DB) |
+
+Make sure `node` and `npm` are available in your `PATH`:
 ```bash
-git clone https://github.com/Sidd4arth/Computer-Vision-Assisted-Interview-Training-System.git
-cd Computer-Vision-Assisted-Interview-Training-System
-```
+node -v   # e.g. v20.12.0
+npm -v    # e.g. 10.5.0
+``` 
 
 ---
 
-## Step 2: Configure Environment Variables
-
-Create a file named `.env.local` in the project root directory.
-
-Add the required environment variables:
-
-```env
-API_KEY=your_api_key_here
-DATABASE_URL=your_database_url_here
-```
-
-### Example
-
-```env
-API_KEY=xxxxxxxxxxxxxxxxxxxx
-
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/app_db
-```
-
-> Note: The `.env.local` file contains sensitive information and should never be committed to version control.
-
----
-
-## Step 3: Install Dependencies
-
-Install all required Node.js packages:
-
+## Clone the Repository
 ```bash
-npm install
+git clone https://github.com/<your‑username>/interview‑evaluation-platform.git
+cd interview‑evaluation-platform
+```
+
+If you need the **v2** tag specifically:
+```bash
+git checkout tags/v2 -b work-v2
 ```
 
 ---
 
-## Step 4: Start PostgreSQL Database
-
-Launch PostgreSQL using Docker:
-
+## Install Dependencies
 ```bash
-docker run --name mockprep-db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=app_db -p 5432:5432 -d postgres:15
+npm ci   # clean install based on package-lock.json
 ```
-
-Verify that the container is running:
-
-```bash
-docker ps
-```
+The command installs all production and dev dependencies (React, Next.js, Drizzle, etc.).
 
 ---
 
-## Step 5: Push Database Schema
+## Environment Configuration
+Create a `.env.local` file at the root (it is ignored by Git). The file must contain at least the following variables:
+```dotenv
+# Database URL (PostgreSQL)
+DATABASE_URL=postgresql://<user>:<password>@localhost:5432/app_db
 
-Create the required database tables using Drizzle ORM:
+# NextAuth secret for session signing
+NEXTAUTH_SECRET=your‑random‑secret
 
-```bash
-npx drizzle-kit push
+# Wandbox API endpoint (used by the compiler backend)
+WANDBOX_API=https://wandbox.org/api
+
+# (Optional) Set a custom port for the dev server
+PORT=3000
 ```
+> **Tip:** You can copy the example from `.env.example` (if present) and adjust the values.
 
 ---
 
-## Step 6: Start the Development Server
+## Database Setup & Migrations
+1. **Create the database** (if it does not exist):
+   ```bash
+   createdb app_db
+   ```
+2. **Run Drizzle migrations** to generate the schema tables:
+   ```bash
+   npx drizzle-kit push   # creates tables defined in src/db/schema.ts
+   ```
+   > The command is idempotent; you can run it again after schema changes.
+3. (Optional) Seed data for local testing:
+   ```bash
+   npm run seed   # you can add a script that loads sample sessions/questions
+   ```
 
-Run the application locally:
+---
 
+## Running the Development Server
 ```bash
 npm run dev
 ```
+The app will be available at `http://localhost:3000` (or the port you defined). The server will hot‑reload on file changes.
+
+### Verifying the new features
+- **Dashboard** – navigate to `/dashboard` after signing in. You should see KPI cards, interactive charts, and a session history table.
+- **Create page** – visit `/create`. Use the **Invite Your Interviewer →** button to generate a UUID‑based link.
 
 ---
 
-## Step 7: Access the Application
-
-Open your browser and navigate to:
-
-```text
-http://localhost:3000
+## Building for Production
+```bash
+npm run build   # creates an optimized production bundle
+npm start       # runs the compiled server
 ```
-
-The application should now be running locally.
+Make sure the `DATABASE_URL` and `NEXTAUTH_SECRET` are set in the production environment.
 
 ---
 
-## Common Commands
-
-### Stop Database Container
-
+## Testing the New Features
+You can run the built‑in lint and type‑check tools:
 ```bash
-docker stop mockprep-db
+npm run lint          # ESLint
+npx tsc --noEmit      # TypeScript type check
 ```
-
-### Start Existing Database Container
-
-```bash
-docker start mockprep-db
-```
-
-### Remove Database Container
-
-```bash
-docker rm -f mockprep-db
-```
-
-### Reinstall Dependencies
-
-```bash
-rm -rf node_modules
-npm install
-```
+For end‑to‑end verification, open a browser and:
+1. Sign up / log in.
+2. Complete a mock interview session.
+3. Visit `/dashboard` – the charts should reflect your data.
+4. Go to `/create` – generate and copy an invite link.
 
 ---
 
-## Troubleshooting
+## Git Tags & Release Workflow
+- **Tag `v1`** – the first basic version (no dashboard).
+- **Tag `v2`** – this version with dashboard & invite page.
 
-### Port 5432 Already in Use
-
-Check for another PostgreSQL instance running on your machine and stop it, or modify the Docker port mapping.
-
-### Environment Variables Not Loaded
-
-Ensure:
-
-* `.env.local` exists in the project root.
-* Variable names are spelled correctly.
-* The development server is restarted after making changes.
-
-### Database Connection Errors
-
-Verify:
-
-* Docker container is running.
-* `DATABASE_URL` matches the PostgreSQL credentials.
-* Database schema has been pushed using:
-
+To create a new tag after further changes:
 ```bash
-npx drizzle-kit push
+git commit -am "Your commit message"
+# Bump the version (semantic versioning recommended)
+git tag -a v3 -m "Release v3 – description"
+git push origin main --tags
 ```
+The CI/CD pipeline (if configured) can automatically publish a Docker image or deploy to Vercel based on tags.
 
 ---
 
-## Project Workflow
+## License
+Distributed under the **MIT License**. See `LICENSE` for details.
 
-```bash
-npm install
-docker run --name mockprep-db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=app_db -p 5432:5432 -d postgres:15
-npx drizzle-kit push
-npm run dev
-```
+---
+
 
 After completing these steps, the Computer Vision Assisted Interview Training System will be available locally for development and testing.
-
-
-<img width="1918" height="907" alt="Screenshot 2026-06-15 030159" src="https://github.com/user-attachments/assets/b269d913-e766-4b5c-ae86-45b8582729fd" />
-<img width="1918" height="910" alt="Screenshot 2026-06-15 030231" src="https://github.com/user-attachments/assets/04542348-5d28-4304-9eb4-3d7e0fc99a98" />
-<img width="1917" height="902" alt="Screenshot 2026-06-15 030250" src="https://github.com/user-attachments/assets/a56c6d94-a8fe-45e9-9ade-762570d43154" />
-<img width="1918" height="910" alt="Screenshot 2026-06-15 030304" src="https://github.com/user-attachments/assets/cd5cf08e-cdba-4020-9387-7791592c26a7" />
-<img width="1918" height="887" alt="Screenshot 2026-06-15 030332" src="https://github.com/user-attachments/assets/24890365-c4c4-4b85-9f9e-317034c6a1eb" />
-<img width="1918" height="912" alt="Screenshot 2026-06-15 030344" src="https://github.com/user-attachments/assets/4a902688-0764-44f8-84fa-01c1d26a981c" />
-<img width="1918" height="907" alt="Screenshot 2026-06-15 030354" src="https://github.com/user-attachments/assets/ff79b90a-5e75-4aa4-875b-20cda585d3a5" />
-<img width="1918" height="900" alt="Screenshot 2026-06-15 030404" src="https://github.com/user-attachments/assets/9ed5a5e2-42c2-49b2-9b24-3d67711d7cac" />
-<img width="1918" height="906" alt="Screenshot 2026-06-15 030423" src="https://github.com/user-attachments/assets/b04469f1-0270-4175-9889-06e661fe6f9a" />
-<img width="1918" height="906" alt="Screenshot 2026-06-15 030441" src="https://github.com/user-attachments/assets/551a9043-81a2-40d3-af00-0080b9be1acc" />
-<img width="1918" height="901" alt="Screenshot 2026-06-15 030501" src="https://github.com/user-attachments/assets/40e75470-c932-4dd4-92cc-e305649ad2c7" />
-<img width="1918" height="657" alt="Screenshot 2026-06-15 030512" src="https://github.com/user-attachments/assets/61d56edc-7ce5-4047-8514-89306c93d702" />
-<img width="1918" height="907" alt="Screenshot 2026-06-15 030518" src="https://github.com/user-attachments/assets/218cdee3-6c1f-43fc-bb26-9ce0deb6cc25" />

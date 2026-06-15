@@ -4,6 +4,17 @@
 const REPO_BASE = "https://api.github.com/repos/liquidslr/interview-company-wise-problems/contents";
 const RAW_BASE = "https://raw.githubusercontent.com/liquidslr/interview-company-wise-problems/main";
 
+const SUPPORTED_QUESTIONS = new Set([
+  "Two Sum",
+  "Valid Parentheses",
+  "Maximum Subarray",
+  "Best Time to Buy and Sell Stock",
+  "Squares of a Sorted Array",
+  "Longest Substring Without Repeating Characters",
+  "Merge Intervals",
+  "LRU Cache"
+]);
+
 interface CSVQuestion {
   difficulty: string;
   title: string;
@@ -175,8 +186,10 @@ async function getRandomQuestions(count: number): Promise<CSVQuestion[]> {
     if (allQuestions.length >= count * 3) break;
   }
 
-  // Shuffle and return
-  return allQuestions.sort(() => Math.random() - 0.5).slice(0, count * 2);
+  // Shuffle and return only supported questions
+  const filtered = allQuestions.filter((q) => SUPPORTED_QUESTIONS.has(q.title));
+  const pool = filtered.length > 0 ? filtered : allQuestions;
+  return pool.sort(() => Math.random() - 0.5).slice(0, count * 2);
 }
 
 /**
@@ -218,6 +231,8 @@ function generateDescription(title: string, topics: string, company: string): st
 You may assume that each input would have exactly one solution, and you may not use the same element twice.
 
 You can return the answer in any order.`,
+    
+    "Squares of a Sorted Array": `Given an integer array nums sorted in non-decreasing order, return an array of the squares of each number sorted in non-decreasing order.`,
     
     "Valid Parentheses": `Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
 
@@ -266,6 +281,10 @@ function generateExamples(title: string, topics: string): Array<{ input: string;
       { input: "nums = [2,7,11,15], target = 9", output: "[0,1]", explanation: "nums[0] + nums[1] == 9" },
       { input: "nums = [3,2,4], target = 6", output: "[1,2]", explanation: "nums[1] + nums[2] == 6" },
     ],
+    "Squares of a Sorted Array": [
+      { input: "nums = [-4,-1,0,3,10]", output: "[0,1,9,16,100]", explanation: "After squaring, the array becomes [16,1,0,9,100]. After sorting, it becomes [0,1,9,16,100]." },
+      { input: "nums = [-7,-3,2,3,11]", output: "[4,9,9,49,121]", explanation: "After squaring, the array becomes [49,9,4,9,121]. After sorting, it becomes [4,9,9,49,121]." },
+    ],
     "Valid Parentheses": [
       { input: 's = "()"', output: "true", explanation: "Single pair of matching parentheses" },
       { input: 's = "()[]{}"', output: "true", explanation: "All brackets match" },
@@ -278,6 +297,16 @@ function generateExamples(title: string, topics: string): Array<{ input: string;
     "Best Time to Buy and Sell Stock": [
       { input: "prices = [7,1,5,3,6,4]", output: "5", explanation: "Buy on day 2 (price=1), sell on day 5 (price=6)" },
       { input: "prices = [7,6,4,3,1]", output: "0", explanation: "No profit possible" },
+    ],
+    "Longest Substring Without Repeating Characters": [
+      { input: 's = "abcabcbb"', output: "3", explanation: 'The answer is "abc", with the length of 3.' },
+      { input: 's = "bbbbb"', output: "1", explanation: 'The answer is "b", with the length of 1.' },
+    ],
+    "Merge Intervals": [
+      { input: "intervals = [[1,3],[2,6],[8,10],[15,18]]", output: "[[1,6],[8,10],[15,18]]", explanation: "Since intervals [1,3] and [2,6] overlap, merge them into [1,6]." },
+    ],
+    "LRU Cache": [
+      { input: '["LRUCache","put","put","get","put","get","put","get","get","get"]\n[[2],[1,1],[2,2],[1],[3,3],[2],[4,4],[1],[3],[4]]', output: "[null,null,null,1,null,-1,null,-1,3,4]", explanation: "Operations on LRU Cache with capacity 2." },
     ],
   };
 
@@ -310,6 +339,12 @@ function generateTestCases(title: string, topics: string): Array<{ input: string
       { input: "[3,3]\n6", expected_output: "[0,1]", is_hidden: true },
       { input: "[1,5,3,7,2]\n9", expected_output: "[1,3]", is_hidden: true },
     ],
+    "Squares of a Sorted Array": [
+      { input: "[-4,-1,0,3,10]", expected_output: "[0,1,9,16,100]", is_hidden: false },
+      { input: "[-7,-3,2,3,11]", expected_output: "[4,9,9,49,121]", is_hidden: false },
+      { input: "[-1,0,1]", expected_output: "[0,1,1]", is_hidden: true },
+      { input: "[-5,-4,-3,-2,-1]", expected_output: "[1,4,9,16,25]", is_hidden: true },
+    ],
     "Valid Parentheses": [
       { input: "()", expected_output: "true", is_hidden: false },
       { input: "()[]{}", expected_output: "true", is_hidden: false },
@@ -330,6 +365,21 @@ function generateTestCases(title: string, topics: string): Array<{ input: string
       { input: "[1,2]", expected_output: "1", is_hidden: true },
       { input: "[2,4,1]", expected_output: "2", is_hidden: true },
     ],
+    "Longest Substring Without Repeating Characters": [
+      { input: "abcabcbb", expected_output: "3", is_hidden: false },
+      { input: "bbbbb", expected_output: "1", is_hidden: false },
+      { input: "pwwkew", expected_output: "3", is_hidden: false },
+      { input: "", expected_output: "0", is_hidden: true },
+    ],
+    "Merge Intervals": [
+      { input: "[[1,3],[2,6],[8,10],[15,18]]", expected_output: "[[1,6],[8,10],[15,18]]", is_hidden: false },
+      { input: "[[1,4],[4,5]]", expected_output: "[[1,5]]", is_hidden: false },
+      { input: "[[1,4],[2,3]]", expected_output: "[[1,4]]", is_hidden: true },
+    ],
+    "LRU Cache": [
+      { input: "2\nput 1 1\nput 2 2\nget 1\nput 3 3\nget 2\nput 4 4\nget 1\nget 3\nget 4", expected_output: "1\n-1\n-1\n3\n4", is_hidden: false },
+      { input: "1\nput 2 1\nget 2", expected_output: "1", is_hidden: true },
+    ],
   };
 
   if (testSets[title]) return testSets[title];
@@ -348,184 +398,318 @@ function generateStarterCode(title: string, topics: string): { python: string; c
     "Two Sum": {
       python: `def two_sum(nums, target):
     # Write your solution here
-    # Return indices of two numbers that add up to target
-    pass
-
-# Read input
-nums = eval(input())
-target = int(input())
-result = two_sum(nums, target)
-print(result)`,
-      cpp: `#include <iostream>
-#include <vector>
-#include <unordered_map>
+    # Return a list of two indices
+    pass`,
+      cpp: `#include <vector>
 using namespace std;
 
 vector<int> twoSum(vector<int>& nums, int target) {
     // Write your solution here
     return {};
-}
-
-int main() {
-    // Input handling provided
-    return 0;
 }`,
       java: `import java.util.*;
 
-public class Main {
-    public static int[] twoSum(int[] nums, int target) {
+class Solution {
+    public int[] twoSum(int[] nums, int target) {
         // Write your solution here
-        return new int[]{};
-    }
-    
-    public static void main(String[] args) {
-        // Input handling provided
+        return new int[0];
     }
 }`,
       javascript: `function twoSum(nums, target) {
     // Write your solution here
     return [];
-}
+}`,
+    },
+    "Squares of a Sorted Array": {
+      python: `class Solution:
+    def sortedSquares(self, nums: list[int]) -> list[int]:
+        # Write your solution here
+        pass`,
+      cpp: `#include <vector>
+#include <algorithm>
+using namespace std;
 
-// Read input
-const nums = JSON.parse(readline());
-const target = parseInt(readline());
-console.log(JSON.stringify(twoSum(nums, target)));`,
+class Solution {
+public:
+    vector<int> sortedSquares(vector<int>& nums) {
+        // Write your solution here
+        return {};
+    }
+};`,
+      java: `import java.util.*;
+
+class Solution {
+    public int[] sortedSquares(int[] nums) {
+        // Write your solution here
+        return new int[0];
+    }
+}`,
+      javascript: `class Solution {
+    /**
+     * @param {number[]} nums
+     * @return {number[]}
+     */
+    sortedSquares(nums) {
+        // Write your solution here
+        return [];
+    }
+}`,
     },
     "Valid Parentheses": {
       python: `def is_valid(s):
     # Write your solution here
     # Return True if valid, False otherwise
-    pass
-
-s = input()
-print(str(is_valid(s)).lower())`,
-      cpp: `#include <iostream>
+    pass`,
+      cpp: `#include <string>
 #include <stack>
-#include <string>
 using namespace std;
 
 bool isValid(string s) {
     // Write your solution here
     return false;
-}
-
-int main() {
-    string s;
-    cin >> s;
-    cout << (isValid(s) ? "true" : "false");
-    return 0;
 }`,
       java: `import java.util.*;
 
-public class Main {
-    public static boolean isValid(String s) {
+class Solution {
+    public boolean isValid(String s) {
         // Write your solution here
         return false;
-    }
-    
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        System.out.println(isValid(sc.next()));
     }
 }`,
       javascript: `function isValid(s) {
     // Write your solution here
     return false;
-}
-
-const s = readline();
-console.log(isValid(s));`,
+}`,
     },
     "Maximum Subarray": {
       python: `def max_subarray(nums):
     # Write your solution here
     # Return the maximum subarray sum
-    pass
-
-nums = eval(input())
-print(max_subarray(nums))`,
-      cpp: `#include <iostream>
-#include <vector>
+    pass`,
+      cpp: `#include <vector>
 #include <climits>
 using namespace std;
 
 int maxSubArray(vector<int>& nums) {
     // Write your solution here
     return 0;
-}
-
-int main() {
-    // Input handling provided
-    return 0;
 }`,
       java: `import java.util.*;
 
-public class Main {
-    public static int maxSubArray(int[] nums) {
+class Solution {
+    public int maxSubArray(int[] nums) {
         // Write your solution here
         return 0;
-    }
-    
-    public static void main(String[] args) {
-        // Input handling provided
     }
 }`,
       javascript: `function maxSubArray(nums) {
     // Write your solution here
     return 0;
-}
+}`,
+    },
+    "Best Time to Buy and Sell Stock": {
+      python: `class Solution:
+    def maxProfit(self, prices: list[int]) -> int:
+        # Write your solution here
+        pass`,
+      cpp: `#include <vector>
+using namespace std;
 
-const nums = JSON.parse(readline());
-console.log(maxSubArray(nums));`,
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        // Write your solution here
+        return 0;
+    }
+};`,
+      java: `import java.util.*;
+
+class Solution {
+    public int maxProfit(int[] prices) {
+        // Write your solution here
+        return 0;
+    }
+}`,
+      javascript: `class Solution {
+    /**
+     * @param {number[]} prices
+     * @return {number}
+     */
+    maxProfit(prices) {
+        // Write your solution here
+        return 0;
+    }
+}`,
+    },
+    "Longest Substring Without Repeating Characters": {
+      python: `class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        # Write your solution here
+        pass`,
+      cpp: `#include <string>
+#include <unordered_set>
+using namespace std;
+
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        // Write your solution here
+        return 0;
+    }
+};`,
+      java: `import java.util.*;
+
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        // Write your solution here
+        return 0;
+    }
+}`,
+      javascript: `class Solution {
+    /**
+     * @param {string} s
+     * @return {number}
+     */
+    lengthOfLongestSubstring(s) {
+        // Write your solution here
+        return 0;
+    }
+}`,
+    },
+    "Merge Intervals": {
+      python: `class Solution:
+    def merge(self, intervals: list[list[int]]) -> list[list[int]]:
+        # Write your solution here
+        pass`,
+      cpp: `#include <vector>
+#include <algorithm>
+using namespace std;
+
+class Solution {
+public:
+    vector<vector<int>> merge(vector<vector<int>>& intervals) {
+        // Write your solution here
+        return {};
+    }
+};`,
+      java: `import java.util.*;
+
+class Solution {
+    public int[][] merge(int[][] intervals) {
+        // Write your solution here
+        return new int[0][0];
+    }
+}`,
+      javascript: `class Solution {
+    /**
+     * @param {number[][]} intervals
+     * @return {number[][]}
+     */
+    merge(intervals) {
+        // Write your solution here
+        return [];
+    }
+}`,
+    },
+    "LRU Cache": {
+      python: `class LRUCache:
+    def __init__(self, capacity: int):
+        # Write your solution here
+        pass
+
+    def get(self, key: int) -> int:
+        return -1
+
+    def put(self, key: int, value: int) -> None:
+        pass`,
+      cpp: `#include <unordered_map>
+#include <list>
+using namespace std;
+
+class LRUCache {
+public:
+    LRUCache(int capacity) {
+        // Write your solution here
+    }
+    
+    int get(int key) {
+        return -1;
+    }
+    
+    void put(int key, int value) {
+    }
+};`,
+      java: `import java.util.*;
+
+class LRUCache {
+    public LRUCache(int capacity) {
+        // Write your solution here
+    }
+    
+    public int get(int key) {
+        return -1;
+    }
+    
+    public void put(int key, int value) {
+    }
+}`,
+      javascript: `class LRUCache {
+    /**
+     * @param {number} capacity
+     */
+    constructor(capacity) {
+        this.capacity = capacity;
+        // Write your solution here
+    }
+
+    /** 
+     * @param {number} key
+     * @return {number}
+     */
+    get(key) {
+        return -1;
+    }
+
+    /** 
+     * @param {number} key 
+     * @param {number} value
+     * @return {void}
+     */
+    put(key, value) {
+    }
+}`,
     },
   };
 
   if (codeTemplates[title]) return codeTemplates[title];
 
   // Generic templates based on topics
-  const funcName = title.toLowerCase().replace(/[^a-z0-9]/g, "_").replace(/_+/g, "_");
-
   return {
     python: `def solve(input_data):
     # Solve: ${title}
     # Topics: ${topics}
-    pass
-
-# Read input and call solve
-data = input()
-print(solve(data))`,
+    pass`,
     cpp: `#include <iostream>
 #include <vector>
+#include <string>
 using namespace std;
 
-// Solve: ${title}
-// Topics: ${topics}
-
-int main() {
-    // Your solution here
-    return 0;
+string solve(string input) {
+    // Write your solution here
+    return "";
 }`,
     java: `import java.util.*;
 
-public class Main {
-    // Solve: ${title}
-    // Topics: ${topics}
-    
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        // Your solution here
+class Solution {
+    public String solve(String input) {
+        // Write your solution here
+        return "";
     }
 }`,
-    javascript: `// Solve: ${title}
-// Topics: ${topics}
-
-function solve(input) {
-    // Your solution here
-}
-
-const input = readline();
-console.log(solve(input));`,
+    javascript: `function solve(input) {
+    // Write your solution here
+    return "";
+}`,
   };
 }
 
@@ -557,16 +741,18 @@ export async function generateQuestionsFromGitHub(
       source = company;
     }
 
-    if (csvQuestions.length === 0) {
-      console.log("No questions found from GitHub, using fallback");
+    // Filter company-specific questions to keep only our supported ones
+    const filteredCsvQuestions = csvQuestions.filter((q) => SUPPORTED_QUESTIONS.has(q.title));
+    if (filteredCsvQuestions.length === 0) {
+      console.log("No supported questions found from GitHub CSV, using fallback");
       return getFallbackQuestions(company, role, count);
     }
 
+    // Sort by frequency (higher = more common in interviews)
+    filteredCsvQuestions.sort((a, b) => b.frequency - a.frequency);
+
     // Balanced difficulty mix for interview practice
     const targetDifficulties: string[] = ["EASY", "MEDIUM", "MEDIUM", "HARD", "MEDIUM"];
-
-    // Sort by frequency (higher = more common in interviews)
-    csvQuestions.sort((a, b) => b.frequency - a.frequency);
 
     // Select diverse questions
     const selected: CSVQuestion[] = [];
@@ -575,7 +761,7 @@ export async function generateQuestionsFromGitHub(
     for (const targetDiff of targetDifficulties) {
       if (selected.length >= count) break;
 
-      const candidates = csvQuestions.filter(
+      const candidates = filteredCsvQuestions.filter(
         (q) => q.difficulty === targetDiff && !usedTitles.has(q.title)
       );
 
@@ -588,9 +774,9 @@ export async function generateQuestionsFromGitHub(
       }
     }
 
-    // Fill remaining with any difficulty
+    // Fill remaining with any difficulty from supported ones
     while (selected.length < count) {
-      const remaining = csvQuestions.filter((q) => !usedTitles.has(q.title));
+      const remaining = filteredCsvQuestions.filter((q) => !usedTitles.has(q.title));
       if (remaining.length === 0) break;
       const pick = remaining[Math.floor(Math.random() * Math.min(20, remaining.length))];
       selected.push(pick);
@@ -610,6 +796,27 @@ export async function generateQuestionsFromGitHub(
  */
 function getFallbackQuestions(company: string, role: string, count: number): GeneratedQuestion[] {
   const fallback: GeneratedQuestion[] = [
+    {
+      title: "Squares of a Sorted Array",
+      difficulty: "Easy",
+      description: `[${company} - ${role}]\n\nGiven an integer array nums sorted in non-decreasing order, return an array of the squares of each number sorted in non-decreasing order.`,
+      examples: [
+        { input: "nums = [-4,-1,0,3,10]", output: "[0,1,9,16,100]", explanation: "After squaring, the array becomes [16,1,0,9,100]. After sorting, it becomes [0,1,9,16,100]." },
+        { input: "nums = [-7,-3,2,3,11]", output: "[4,9,9,49,121]", explanation: "After squaring, the array becomes [49,9,4,9,121]. After sorting, it becomes [4,9,9,49,121]." },
+      ],
+      testCases: [
+        { input: "[-4,-1,0,3,10]", expected_output: "[0,1,9,16,100]", is_hidden: false },
+        { input: "[-7,-3,2,3,11]", expected_output: "[4,9,9,49,121]", is_hidden: false },
+        { input: "[-1,0,1]", expected_output: "[0,1,1]", is_hidden: true },
+        { input: "[-5,-4,-3,-2,-1]", expected_output: "[1,4,9,16,25]", is_hidden: true },
+      ],
+      starterCode: {
+        python: `class Solution:\n    def sortedSquares(self, nums: list[int]) -> list[int]:\n        # Write your solution here\n        return sorted([x*x for x in nums])`,
+        cpp: `#include <vector>\n#include <algorithm>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> sortedSquares(vector<int>& nums) {\n        // Write your solution here\n        vector<int> res;\n        for (int x : nums) res.push_back(x * x);\n        sort(res.begin(), res.end());\n        return res;\n    }\n};\n`,
+        java: `import java.util.*;\n\nclass Solution {\n    public int[] sortedSquares(int[] nums) {\n        // Write your solution here\n        int[] res = new int[nums.length];\n        for (int i = 0; i < nums.length; i++) {\n            res[i] = nums[i] * nums[i];\n        }\n        Arrays.sort(res);\n        return res;\n    }\n}\n`,
+        javascript: `class Solution {\n    /**\n     * @param {number[]} nums\n     * @return {number[]}\n     */\n    sortedSquares(nums) {\n        // Write your solution here\n        return nums.map(x => x * x).sort((a, b) => a - b);\n    }\n}\n`,
+      },
+    },
     {
       title: "Two Sum",
       difficulty: "Easy",

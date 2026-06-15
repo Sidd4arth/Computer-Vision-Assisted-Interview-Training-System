@@ -47,6 +47,18 @@ export default async function HomePage() {
           </span>
           <div className="flex items-center gap-4">
             <Link
+              href="/dashboard"
+              className="font-mono text-xs text-neutral-500 hover:text-neutral-200 transition-colors"
+            >
+              Dashboard
+            </Link>
+            <Link
+              href="/create"
+              className="font-mono text-xs text-neutral-500 hover:text-neutral-200 transition-colors"
+            >
+              Create
+            </Link>
+            <Link
               href="/new-session"
               className="font-mono text-xs border border-neutral-700 hover:border-neutral-500 px-4 py-2 rounded transition-colors"
             >

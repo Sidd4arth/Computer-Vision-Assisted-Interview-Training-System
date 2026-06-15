@@ -2,7 +2,21 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import WebcamPanel from "./WebcamPanel";
+
+// Monaco Editor loaded client-side only (no SSR)
+const MonacoEditor = dynamic(
+  () => import("@monaco-editor/react").then((m) => m.default),
+  { ssr: false, loading: () => <div className="flex-1 flex items-center justify-center"><span className="font-mono text-xs text-neutral-600">Loading editor…</span></div> }
+);
+
+const MONACO_LANG: Record<string, string> = {
+  python: "python",
+  cpp: "cpp",
+  java: "java",
+  javascript: "javascript",
+};
 
 interface Question {
   id: number;
@@ -78,12 +92,14 @@ export default function InterviewClient({
 
   const q = questions[qIdx];
 
+  // Init per-question, per-language code state from starter code
   useEffect(() => {
     const init: Record<string, Record<string, string>> = {};
     questions.forEach((q) => { init[q.id] = { ...q.starterCode }; });
     setCodes(init);
   }, [questions]);
 
+  // Sync timer with server start time
   useEffect(() => {
     if (session.startedAt && isStarted) {
       const elapsed = Math.floor((Date.now() - new Date(session.startedAt).getTime()) / 1000);
@@ -91,6 +107,7 @@ export default function InterviewClient({
     }
   }, [session.startedAt, session.duration, isStarted]);
 
+  // Countdown timer
   useEffect(() => {
     if (!isStarted) return;
     const id = setInterval(() => {
@@ -119,13 +136,17 @@ export default function InterviewClient({
         setIsStarted(true);
         setStartError("");
       } else {
-        const data = await res.json();
-        setStartError(data.error || "Failed to start session");
-        console.error("Start session error:", data);
+        let errMsg = `Server error (${res.status})`;
+        try {
+          const data = await res.json();
+          errMsg = data.error || errMsg;
+        } catch { /* body wasn't JSON */ }
+        setStartError(errMsg);
+        console.error("Start session error:", res.status, errMsg);
       }
     } catch (e) {
       console.error(e);
-      setStartError("Network error while starting session");
+      setStartError("Network error. Check your connection and try again.");
     }
   };
 
@@ -136,24 +157,38 @@ export default function InterviewClient({
     try { await fetch(`/api/sessions/${session.uid}/complete`, { method: "POST" }); router.push(`/results/${session.uid}`); } catch { /* */ }
   }, [session.uid, router]);
 
+  const currentCode = codes[q?.id]?.[lang] || "";
+
+  const setCurrentCode = (val: string) => {
+    if (!q) return;
+    setCodes((p) => ({ ...p, [q.id]: { ...p[q.id], [lang]: val } }));
+  };
+
   const runCode = async () => {
     if (!q) return;
     setRunning(true); setShowConsole(true); setOutput("Running…\n");
     try {
       const res = await fetch(`/api/sessions/${session.uid}/submit`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ questionId: q.id, language: lang, code: codes[q.id]?.[lang] || "", submissionType: "run" }),
+        body: JSON.stringify({ questionId: q.id, language: lang, code: currentCode, submissionType: "run" }),
       });
       const data = await res.json();
+      if (data.error) { setOutput(`Error: ${data.error}`); return; }
       if (data.results) {
         let o = "";
         (data.results as SubmissionResult[]).forEach((r, i) => {
-          o += `Case ${i + 1}: ${r.passed ? "PASS" : "FAIL"}\n  out: ${r.output}\n${r.expected ? `  exp: ${r.expected}\n` : ""}  ${r.time_ms}ms · ${(r.memory_kb / 1024).toFixed(1)}MB\n\n`;
+          const status = r.passed ? "✓ PASS" : "✗ FAIL";
+          o += `Case ${i + 1}: ${status}  (${r.time_ms}ms)\n`;
+          if (!r.passed) {
+            o += `  Output:   ${r.output?.trim() || "(empty)"}\n`;
+            o += `  Expected: ${r.expected?.trim() || "(empty)"}\n`;
+          }
+          o += "\n";
         });
         o += `${data.totalPassed}/${data.totalTests} passed`;
         setOutput(o);
       }
-    } catch { setOutput("Error"); } finally { setRunning(false); }
+    } catch { setOutput("Network error. Please try again."); } finally { setRunning(false); }
   };
 
   const submitCode = async () => {
@@ -162,24 +197,25 @@ export default function InterviewClient({
     try {
       const res = await fetch(`/api/sessions/${session.uid}/submit`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ questionId: q.id, language: lang, code: codes[q.id]?.[lang] || "", submissionType: "submit" }),
+        body: JSON.stringify({ questionId: q.id, language: lang, code: currentCode, submissionType: "submit" }),
       });
       const data = await res.json();
+      if (data.error) { setOutput(`Error: ${data.error}`); return; }
       if (data.results) {
-        let o = `VERDICT: ${data.verdict}\n\n`;
+        let o = `━━ VERDICT: ${data.verdict} ━━\n\n`;
         (data.results as SubmissionResult[]).forEach((r, i) => {
-          o += `Case ${i + 1}: ${r.passed ? "PASS" : "FAIL"} · ${r.time_ms}ms\n`;
+          o += `Case ${i + 1}: ${r.passed ? "✓ PASS" : "✗ FAIL"}  (${r.time_ms}ms)\n`;
         });
         o += `\n${data.totalPassed}/${data.totalTests} passed`;
         setOutput(o);
         setVerdicts((p) => ({ ...p, [q.id]: data.verdict }));
       }
-    } catch { setOutput("Error"); } finally { setSubmitting(false); }
+    } catch { setOutput("Network error. Please try again."); } finally { setSubmitting(false); }
   };
 
   const fmt = (s: number) => `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
 
-  // Pre-start
+  // Pre-start screen
   if (!isStarted) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
@@ -194,13 +230,13 @@ export default function InterviewClient({
           </div>
 
           <button onClick={startSession}
-            disabled={session.status !== "ready" || isStarted}
+            disabled={session.status === "generating" || isStarted}
             className="w-full bg-white text-black font-mono text-sm py-3 rounded hover:bg-neutral-200 transition-colors disabled:opacity-50">
-            Start →
+            {session.status === "generating" ? "Preparing questions…" : "Start →"}
           </button>
           {startError && (<p className="mt-2 text-xs text-red-500">{startError}</p>)}
-          {session.status !== "ready" && (
-            <p className="mt-2 text-xs text-neutral-400">Session not ready. Please wait...</p>
+          {session.status === "generating" && (
+            <p className="mt-2 text-xs text-neutral-400">Still generating questions, please wait a moment...</p>
           )}
         </div>
       </div>
@@ -255,9 +291,10 @@ export default function InterviewClient({
         ))}
       </div>
 
-      {/* Main */}
+      {/* Main layout */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Problem */}
+
+        {/* Problem panel */}
         <div className={`${mobPanel === "problem" ? "flex" : "hidden"} md:flex flex-col w-full md:w-[45%] border-r border-neutral-900 overflow-hidden`}>
           <div className="flex border-b border-neutral-900 shrink-0">
             {([{ k: "desc" as const, l: "Problem" }, { k: "tests" as const, l: "Tests" }, { k: "subs" as const, l: "Submissions" }]).map((t) => (
@@ -313,8 +350,9 @@ export default function InterviewClient({
           </div>
         </div>
 
-        {/* Editor */}
+        {/* Code editor panel */}
         <div className={`${mobPanel === "code" ? "flex" : "hidden"} md:flex flex-col w-full md:flex-1 overflow-hidden`}>
+          {/* Toolbar */}
           <div className="flex items-center justify-between px-3 py-1.5 border-b border-neutral-900 shrink-0">
             <select value={lang} onChange={(e) => setLang(e.target.value)}
               className="bg-transparent border border-neutral-800 rounded px-2 py-1 font-mono text-xs text-neutral-400 focus:outline-none">
@@ -334,32 +372,47 @@ export default function InterviewClient({
               </button>
             </div>
           </div>
+
+          {/* Monaco Editor */}
           <div className="flex-1 overflow-hidden flex flex-col">
             <div className="flex-1 overflow-hidden">
-              <textarea
-                value={codes[q?.id]?.[lang] || ""}
-                onChange={(e) => {
-                  if (!q) return;
-                  setCodes((p) => ({ ...p, [q.id]: { ...p[q.id], [lang]: e.target.value } }));
+              <MonacoEditor
+                height="100%"
+                language={MONACO_LANG[lang]}
+                value={currentCode}
+                onChange={(val) => setCurrentCode(val || "")}
+                theme="vs-dark"
+                options={{
+                  fontSize: 13,
+                  fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",
+                  minimap: { enabled: false },
+                  scrollBeyondLastLine: false,
+                  lineNumbers: "on",
+                  renderLineHighlight: "line",
+                  tabSize: 4,
+                  automaticLayout: true,
+                  padding: { top: 12, bottom: 12 },
+                  wordWrap: "on",
+                  formatOnPaste: true,
+                  suggest: { showKeywords: true },
                 }}
-                className="w-full h-full bg-neutral-950 text-neutral-300 font-mono text-xs p-4 resize-none focus:outline-none leading-6 caret-white"
-                spellCheck={false}
-                placeholder="// write your solution"
               />
             </div>
+
+            {/* Console output */}
             {showConsole && (
-              <div className="h-36 border-t border-neutral-900 flex flex-col shrink-0">
+              <div className="h-40 border-t border-neutral-900 flex flex-col shrink-0">
                 <div className="flex items-center justify-between px-3 py-1 border-b border-neutral-900">
                   <span className="font-mono text-[10px] text-neutral-600">output</span>
                   <button onClick={() => setShowConsole(false)} className="font-mono text-[10px] text-neutral-700 hover:text-neutral-400">×</button>
                 </div>
-                <pre className="flex-1 overflow-y-auto p-3 font-mono text-[11px] text-neutral-400 whitespace-pre-wrap">{output}</pre>
+                <pre className="flex-1 overflow-y-auto p-3 font-mono text-[11px] text-neutral-400 whitespace-pre-wrap leading-5">{output}</pre>
               </div>
             )}
           </div>
         </div>
 
-        {/* Webcam */}
+        {/* Webcam panel */}
         <div className={`${mobPanel === "webcam" ? "flex" : "hidden"} md:flex flex-col w-full md:w-[200px] lg:w-[220px] border-l border-neutral-900 p-2.5 gap-2.5 overflow-y-auto`}>
           <div className={`transition-shadow rounded-lg ${camGlow ? "webcam-glow" : ""}`}>
             <WebcamPanel isStarted={isStarted} onEventsUpdate={onEvts} onWarning={onWarning} />
