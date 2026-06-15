@@ -169,4 +169,4 @@ npx drizzle-kit push
 npm run dev
 ```
 
-After completing these steps, the Computer Vision Assisted Interview Training System will be available locally for development and testing.
+After completing these steps, the Computer Vision Assisted Interview Training System will be available locally.
